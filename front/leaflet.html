@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shapefile Visualization</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js"></script>
+    <script src="https://unpkg.com/shpjs/dist/shp.js"></script>
+</head>
+<body>
+    <div id="mapid" style="height: 600px;"></div>
+    <script>
+        var mymap = L.map('mapid').setView([34.0522, -118.2437], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(mymap);
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        shp("http://localhost:8000/LACity.zip").then(function(geojson){
+            var geoLayer = L.geoJSON(geojson, {
+                style: function() {
+                    return {
+                        color: getRandomColor(),
+                        fillOpacity: 0.5
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.bindPopup(JSON.stringify(feature.properties));
+                }
+            }).addTo(mymap);
+        });
+    </script>
+</body>
+</html>
